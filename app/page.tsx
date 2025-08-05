@@ -1,66 +1,105 @@
-"use client"
-import { Pencil } from "lucide-react"
-import Link from "next/link"
-import { title } from "process"
-import { useState } from "react"
+"use client";
+import { Heading5, Pencil, Trash2 } from "lucide-react";
+import Link from "next/link";
+// import { useState } from "react"
+import { useTaskStore } from "./store";
+import { useRouter } from "next/navigation";
 
-export type Tasks = {
-  id: string,
-  description: string,
-  date: string,
-  title: string,
-  status: string,
-}
+// const data:Tasks[] =[
+//   {
+//     id: Number(crypto.randomUUID()),
+//     description: "Math",
+//     date: "1 August",
+//     title: "task1",
+//     status: "done",
+//   },
+//   {
+//     id: 44,
+//     description: "fizik",
+//     date: "2 August",
+//     title: "task2",
+//     status: "in_progress",
+//   },
+//   {
+//     id: 76,
+//     description: "programming",
+//     date: "3 August",
+//     title: "task3",
+//     status: "done",
+//   }
 
-const data:Tasks[] =[
-  {
-    id: Number(crypto.randomUUID()),
-    description: "Math",
-    date: "1 August",
-    title: "task1",
-    status: "done",
-  },
-  {
-    id: 44,
-    description: "fizik",
-    date: "2 August",
-    title: "task2",
-    status: "in_progress",
-  },
-  {
-    id: 76,
-    description: "programming",
-    date: "3 August",
-    title: "task3",
-    status: "done",
-  }
-
-] 
-
-
-
+// ]
 
 export default function Home() {
-  const [tasks, setTasks] = useState<Tasks[]>(data);
-  return(
-    <div className="max-w-[600px] mx-auto mt-56">
-     
-      
+  const tasks = useTaskStore((state) => state.task);
+  const router = useRouter();
+  console.log(tasks);
+
+  function handleClick() {
+    router.push("./add-tasks");
+  }
+
+  const removeTask = useTaskStore((state) => state.removeTask);
+  const changeStatus = useTaskStore((state) => state.changeStatus);
+  console.log(changeStatus);
+
+  function handleclick(id: string) {
+    removeTask(id);
+  }
+
+  function handleChangeStatus(id: string, status: string) {
+    changeStatus(id, status);
+  }
+
+  function handleEdit(id: string) {
+    router.push(`/edit?id=${id}`);
+  }
+  return (
+    <div className="max-w-[700px] mx-auto mt-56">
       <ul className="border-2 border-solid border-blue-300 px-4 py-4 text-shadow-stone-700 bg-blue-200 rounded-2xl ">
-        {tasks.map((task) => 
-        <div className="text-center flex justify-between">
+        {tasks.length !==0 ?  tasks.map((task) => (
+          <div key={task.id} className="flex justify-between">
+            <div className="mt-2">
+              <li>Title: {task.title}</li>
+              <p className="text-sm text-neutral-700">
+                Description: {task.description}
+              </p>
+              <span>Status: {task.status === 'in_progress' ? 'In progress' : 'Done'}</span>
+              <br></br>
+            </div>
 
-          <li className="" key={task.id}>{task.title}</li>
-          <button><Link href="/edit"><Pencil size={16}/></Link></button>
-        </div>
-        )}
+            <div className="flex items-center gap-2 ">
+              <select
+                className="px-2 py-2 border border-neutral-400 rounded-md"
+                value={task.status as string}
+                onChange={(e) => {
+                  console.log(e.target.value);
+
+                  const status = e.target.value;
+                  handleChangeStatus(task.id as string, status);
+                }}
+              >
+                <option value={"in_progress"}>in progress</option>
+                <option value={"done"}>done</option>
+              </select>
+              <div className="flex gap-2  ">
+                <button onClick={() => handleEdit(task.id ?? '')}>
+                  <Pencil size={16} />
+                </button>
+                <button onClick={() => handleclick(task.id ?? '')}>
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            </div>
+          </div>
+        )) : <h5 className="text-center">No Task.</h5>}
       </ul>
-      <button><Link href="/add-tasks">Add tasks</Link></button>
-
-       
+      <button
+        className="rounded-lg p-3 border border-neutral-400 w-full cursor-pointer mx-auto mt-6"
+        onClick={() => handleClick()}
+      >
+        Add tasks
+      </button>
     </div>
-  )
+  );
 }
-
-
-
