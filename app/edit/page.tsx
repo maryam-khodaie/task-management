@@ -1,6 +1,5 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
-// import { useTaskStore } from "../store";
 import { useState } from "react";
 import { Tasks, useTaskStore } from "../store";
 export default function Edit() {
@@ -38,7 +37,7 @@ export default function Edit() {
         onClick={handleEdit}
         className="rounded-lg p-3 border border-neutral-400 max-w-96 min-w-96 cursor-pointer"
       >
-        Edit
+        Edited
       </button>
       <button
         onClick={() => router.back()}
